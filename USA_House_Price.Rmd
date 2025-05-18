@@ -1,0 +1,302 @@
+---
+title: "House Price Index Analysis"
+author: "Tom POLLET"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+#install.packages("e1071")
+#install.packages("psych")
+#install.packages("tseries")
+#install.packages("corrplot")
+#install.packages("knitr")
+#install.packages("stargazer")
+#install.packages("lmtest")
+#install.packages ("car")
+#install.packages ("FactorMineR")
+#install.packages ("factoextra")
+```
+
+```{r}
+library("readxl")
+library("e1071")
+library("tseries")
+library("corrplot")
+library("psych")
+library("knitr")
+library("stargazer")
+library("lmtest")
+library("car")
+library("FactoMineR")
+library("factoextra")
+```
+
+```{r}
+setwd("C:/Users/tom36/Desktop/RRRR")
+data<-read_excel("data.xlsx")
+data$Consumer_Confidence_Index <- NULL
+data$Interest_Rate_Loans <- NULL
+data$Target_Upper_Limit <- NULL
+data$Target_Lower_Limit <- NULL
+View(data)
+```
+
+```{r}
+cols_to_convert <- setdiff(names(data), "Date")
+data[cols_to_convert] <- lapply(data[cols_to_convert], function(x) as.numeric(as.character(x)))
+```
+
+### Descriptive Statistics
+
+```{r}
+psych::describe(data)
+```
+```{r}
+summary(data)
+```
+
+
+```{r}
+cat("House Price Index Mean :", mean(data$House_Price_Index), "\n")
+```
+```{r}
+cat("House Price Index Empirical Variance :", var(data$House_Price_Index), "\n")
+```
+```{r}
+cat("House Price Index Empirical Standrard Deviation :", sd(data$House_Price_Index), "\n")
+```
+```{r}
+cat("House Price Index Skewness :", skewness(data$House_Price_Index), "\n")
+```
+```{r}
+cat("House Price Index Kurtosis :", kurtosis(data$House_Price_Index), "\n")
+```
+### Graphical Representation of Data
+
+```{r}
+hist(data$House_Price_Index, 
+     main = "House Price Index Distribution",
+     xlab = "House Price Index Monthly Diff",
+     ylab = "Frequency",
+     col = rgb(0.2, 0.5, 0.8, 0.5),
+     border = "white",
+     breaks = 30,
+     freq = FALSE)
+
+lines(density(data$House_Price_Index, na.rm = TRUE), 
+      col = "blue", 
+      lwd = 2)
+```
+```{r}
+
+to_diff <- c('CPI', 'GDP', 'PCE', 'Core_CPI', 'PCEPI', 'PPI', 'Real_Export_Rate',
+             'Inflation_Expectations', 'Eurozone_CPI', 'China_CPI',
+             'WTI_Crude_Oil', 'Brent_Crude_Oil',
+             'Fed_Asset', 'Fed_Reserve',
+             'Money_Supply_M2', 'Monetary_Base',
+             'Construction_Spending_Residential',
+             'Bank_Credit', 'Real_Estate_Loans',
+             'Total_Vehicle_Sales', 'Population',
+             'USD_Index', 'Exchange_Rate_USD_EUR',
+             'Construction_Materials_Price_Index')
+
+
+data_diff <- data
+
+for (var in to_diff) {
+  data_diff[[paste0(var, "_diff")]] <- c(NA, diff(data[[var]]))
+  
+  data_diff[[var]] <- NULL
+}
+
+data_diff <- data_diff[, c(setdiff(names(data_diff), "House_Price_Index"), "House_Price_Index")]
+
+data_diff <- data_diff[-1, ]
+```
+
+```{r}
+cor_matrix <- cor(data_diff[, sapply(data_diff, is.numeric)], use = "complete.obs", method = "pearson")
+
+png("correlation_heatmap_large.png", width = 8000, height = 8000, res = 1000)
+
+corrplot(cor_matrix,
+         method = "color",
+         type = "full",
+         tl.col = "black",
+         tl.cex = 0.8,   
+         cl.cex = 0.8, 
+         number.cex = 0.7,   
+         mar = c(1, 1, 1, 1))
+
+dev.off()
+
+corrplot(cor_matrix,
+         method = "color",
+         type = "full",
+         tl.col = "black",
+         tl.cex = 0.2,   
+         cl.cex = 0.2, 
+         number.cex = 0.2,   
+         mar = c(1, 1, 1, 1))
+```
+```{r}
+house_price_corr <- cor_matrix["House_Price_Index", , drop = TRUE]
+
+house_price_corr_sorted <- sort(house_price_corr, decreasing = TRUE)
+
+house_price_corr_df <- data.frame(Variable = names(house_price_corr_sorted),
+                                  Correlation = house_price_corr_sorted)
+
+kable(house_price_corr_df, col.names = c("Variable", "Correlation"), caption = "Correlation with House_Price_Index")
+```
+
+### Model 1 - Regresssion + Equation
+
+```{r}
+data_numeric <- data_diff[, !(names(data_diff) %in% c("Date"))]
+
+model <- lm(House_Price_Index ~ ., data = data_numeric)
+
+summary(model)
+```
+```{r}
+data_diff$House_Price_Index_fitted<-model$fitted.values
+plot(House_Price_Index ~ Date, data=data_diff)
+lines(House_Price_Index_fitted ~ Date, col="red", data=data_diff)
+data_diff$House_Price_Index_fitted <- NULL
+```
+
+### Model 1 - Diagnostic
+
+```{r}
+stargazer(model,type="text", dep.var.labels = c("House_Price_Index"), out="model_1_summary.txt")
+```
+```{r}
+plot(model, which=1)
+```
+```{r}
+plot(model, which =3)
+```
+```{r}
+plot (model, which = 2)
+```
+```{r}
+plot(model, which = 4)
+```
+```{r}
+N = nrow(data)
+cooksd <- cooks.distance(model)
+outliers <- as.numeric(names(cooksd)[(cooksd > (4/N))])
+cat(outliers)
+```
+
+
+```{r}
+residual_model<-resid(model)
+plot(residual_model)
+```
+```{r}
+dwtest(model)
+```
+```{r}
+vif(model)
+```
+### Improvement - Outliers
+
+```{r}
+data_without_outliers <- data_diff[-c(1, 3, 4, 10, 16, 17, 18, 21, 27, 32, 34, 43, 51, 55, 73, 97, 109, 119), ]
+```
+
+### Improvement - Dimensionality Reduction / Remove Multicollinearity Issue / Reduce Overfitting
+
+```{r}
+res.pca <- PCA(subset(data_without_outliers, select = -c(Date, House_Price_Index)), graph = TRUE, ncp=20)
+fviz_pca_var(res.pca, col.var = "cos2",
+         	gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+         	repel = TRUE
+         	)
+```
+```{r}
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+```
+```{r}
+explained_var <- res.pca$eig[,2]
+component <- which(cumsum(explained_var) / sum(explained_var) >= 0.50)[1]
+
+pca_scores <- res.pca$ind$coord[, 1:component]
+```
+
+```{r}
+pca_scores_with_target <- cbind(pca_scores, House_Price_Index = data_without_outliers$House_Price_Index)
+pca_scores_with_target_df <- as.data.frame(pca_scores_with_target)
+```
+
+### Model 2 - Regresssion + Equation
+
+```{r}
+model_pca <- lm(House_Price_Index ~ ., data = pca_scores_with_target_df)
+```
+
+```{r}
+summary(model_pca)
+```
+```{r}
+stargazer(model_pca,type="text", dep.var.labels = c("House_Price_Index"), out="model_2_summary.txt")
+```
+
+### Model 2 - Diagnostic
+
+```{r}
+data_without_outliers$House_Price_Index_fitted<-model_pca$fitted.values
+plot(House_Price_Index ~ Date, data=data_without_outliers)
+lines(House_Price_Index_fitted ~ Date, col="red", data=data_without_outliers)
+data_without_outliers$House_Price_Index_fitted <- NULL
+```
+```{r}
+plot(model_pca, which=1)
+```
+```{r}
+plot(model_pca, which=3)
+```
+```{r}
+plot(model_pca, which=2)
+```
+```{r}
+plot(model_pca, which=4)
+```
+```{r}
+N_2 = nrow(data_without_outliers)
+cooksd_2 <- cooks.distance(model_pca)
+outliers_2 <- as.numeric(names(cooksd_2)[(cooksd_2 > (4/N_2))])
+cat(outliers_2)
+```
+```{r}
+residual_model<-resid(model_pca)
+plot(residual_model)
+```
+
+```{r}
+dwtest(model_pca)
+```
+### Model 2 - Variable Importance / Model Interpretation
+
+```{r}
+contrib_matrix <- res.pca$var$contrib[, 1:component]
+avg_contrib <- rowMeans(contrib_matrix)
+
+
+sorted_contrib <- sort(avg_contrib, decreasing = TRUE)
+head(sorted_contrib, 10)
+```
+```{r}
+fviz_contrib(res.pca, choice = "var", axes = 1)
+```
+```{r}
+fviz_contrib(res.pca, choice = "var", axes = 2)
+```
+```{r}
+fviz_contrib(res.pca, choice = "var", axes = 3)
+```

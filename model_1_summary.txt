@@ -1,0 +1,146 @@
+
+===================================================================
+                                            Dependent variable:    
+                                        ---------------------------
+                                                   House           
+-------------------------------------------------------------------
+UnemploymentRate                                   0.550           
+                                                  (0.440)          
+                                                                   
+FedFundsRate                                      -8.776           
+                                                 (19.550)          
+                                                                   
+`10Y_Treasury_Yield`                              -24.994          
+                                                 (21.321)          
+                                                                   
+`2Y_Treasury_Yield`                               -9.042           
+                                                 (19.796)          
+                                                                   
+Consumer_Sentiment_Index                          -0.007           
+                                                  (0.017)          
+                                                                   
+Housing_Starts                                     0.001           
+                                                  (0.001)          
+                                                                   
+Mortgage_Rates                                     0.556           
+                                                  (0.710)          
+                                                                   
+`10Yr_Treasury_Rate`                              24.385           
+                                                 (21.378)          
+                                                                   
+`2Yr_Treasury_Rate`                                9.562           
+                                                 (19.706)          
+                                                                   
+`5Yr_Breakeven_Inflation`                         491.051          
+                                                 (584.555)         
+                                                                   
+`10Yr_Breakeven_Inflation`                       -984.556          
+                                                (1,168.985)        
+                                                                   
+Non_Farm_Payrolls                                0.0003**          
+                                                 (0.0001)          
+                                                                   
+Job_Openings                                      0.0002           
+                                                 (0.0003)          
+                                                                   
+Bank_Loan_Rate                                    6.461**          
+                                                  (2.787)          
+                                                                   
+Corporate_Yield                                   -0.361           
+                                                  (0.237)          
+                                                                   
+Effective_Rate                                     1.055           
+                                                 (19.925)          
+                                                                   
+Inflation_5y_Expectation                          494.266          
+                                                 (584.409)         
+                                                                   
+Supply_New_Houses                                 -0.215*          
+                                                  (0.126)          
+                                                                   
+Labor_Force_Participation_Rate                    0.717**          
+                                                  (0.346)          
+                                                                   
+CPI_diff                                           0.011           
+                                                  (0.461)          
+                                                                   
+GDP_diff                                           0.001           
+                                                  (0.003)          
+                                                                   
+PCE_diff                                          -0.002           
+                                                  (0.002)          
+                                                                   
+Core_CPI_diff                                     -0.181           
+                                                  (0.421)          
+                                                                   
+PCEPI_diff                                        -0.806           
+                                                  (1.517)          
+                                                                   
+PPI_diff                                          0.149*           
+                                                  (0.076)          
+                                                                   
+Real_Export_Rate_diff                              0.004           
+                                                  (0.009)          
+                                                                   
+Inflation_Expectations_diff                        0.105           
+                                                  (0.246)          
+                                                                   
+Eurozone_CPI_diff                                 -0.192           
+                                                  (0.123)          
+                                                                   
+China_CPI_diff                                    -0.263*          
+                                                  (0.139)          
+                                                                   
+WTI_Crude_Oil_diff                                -0.003           
+                                                  (0.027)          
+                                                                   
+Brent_Crude_Oil_diff                               0.010           
+                                                  (0.027)          
+                                                                   
+Fed_Asset_diff                                  -0.00001***        
+                                                 (0.00000)         
+                                                                   
+Fed_Reserve_diff                                  0.0004           
+                                                  (0.002)          
+                                                                   
+Money_Supply_M2_diff                              -0.0002          
+                                                  (0.002)          
+                                                                   
+Monetary_Base_diff                                -0.0004          
+                                                  (0.002)          
+                                                                   
+Construction_Spending_Residential_diff           -0.00000          
+                                                 (0.00001)         
+                                                                   
+Bank_Credit_diff                                  -0.003           
+                                                  (0.002)          
+                                                                   
+Real_Estate_Loans_diff                             0.004           
+                                                  (0.006)          
+                                                                   
+Total_Vehicle_Sales_diff                          -0.162           
+                                                  (0.098)          
+                                                                   
+Population_diff                                   -0.004           
+                                                  (0.003)          
+                                                                   
+USD_Index_diff                                     0.055           
+                                                  (0.077)          
+                                                                   
+Exchange_Rate_USD_EUR_diff                         3.536           
+                                                  (3.430)          
+                                                                   
+Construction_Materials_Price_Index_diff           -0.026*          
+                                                  (0.015)          
+                                                                   
+Constant                                        -111.656***        
+                                                 (25.725)          
+                                                                   
+-------------------------------------------------------------------
+Observations                                        132            
+R2                                                 0.734           
+Adjusted R2                                        0.603           
+Residual Std. Error                           0.557 (df = 88)      
+F Statistic                               5.634*** (df = 43; 88)   
+===================================================================
+Note:                                   *p<0.1; **p<0.05; ***p<0.01
